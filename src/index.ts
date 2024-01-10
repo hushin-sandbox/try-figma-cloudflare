@@ -1,9 +1,39 @@
-import { Hono } from 'hono'
+import { Hono } from 'hono';
+import { env } from 'hono/adapter';
 
-const app = new Hono()
+const app = new Hono();
 
 app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+  return c.text('Hello Hono!');
+});
 
-export default app
+app.post('/upload', async (c) => {
+  const figmaUrl = await c.req.text();
+
+  const [_1, fileKey] = figmaUrl.match(/\/file\/([a-zA-Z0-9]+)/) || [];
+  const [_2, nodeId] = figmaUrl.match(/node-id=(\d+-\d+)/) || [];
+
+  if (!fileKey || !nodeId) {
+    return c.json({ message: 'Invalid URL' });
+  }
+
+  const { FIGMA_TOKEN } = env<{ FIGMA_TOKEN: string }>(c);
+
+  const imageResult = (await fetch(
+    `https://api.figma.com/v1/images/${fileKey}?ids=${nodeId}&scale=1&format=png`,
+    {
+      headers: {
+        'X-Figma-Token': FIGMA_TOKEN,
+      },
+    }
+  ).then((res) => res.json())) as { images: Record<string, string> };
+
+  const image = Object.values(imageResult.images)[0];
+  if (!image) {
+    return c.json({ message: 'Invalid URL' });
+  }
+
+  return c.json({ url: image });
+});
+
+export default app;
