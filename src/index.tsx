@@ -39,7 +39,7 @@ app.post(
     const [_2, nodeId] = figmaUrl.match(/node-id=(\d+-\d+)/) || [];
 
     if (!fileKey || !nodeId) {
-      return c.json({ message: 'Invalid URL' });
+      return c.json({ message: 'Invalid URL' }, 400);
     }
 
     const imageResult = (await fetch(
@@ -53,7 +53,7 @@ app.post(
 
     const imageUrl = Object.values(imageResult.images)[0];
     if (!imageUrl) {
-      return c.json({ message: 'Invalid URL' });
+      return c.json({ message: 'figma error' }, 400);
     }
     const fileName = imageUrl.split('/').at(-1) + '.png';
     const image = await fetch(imageUrl).then((res) => res.arrayBuffer());
