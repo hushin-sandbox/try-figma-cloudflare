@@ -4,6 +4,7 @@ import { cache } from 'hono/cache';
 type Bindings = {
   FIGMA_TOKEN: string;
   FIGMA_IMAGE_BUCKET: R2Bucket;
+  FIGMA_URL_KV: KVNamespace;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -43,6 +44,7 @@ app.post('/upload', async (c) => {
       contentType: 'image/png',
     },
   });
+  await c.env.FIGMA_URL_KV.put(fileName, figmaUrl);
 
   return c.text(fileName);
 });
@@ -68,6 +70,14 @@ app.get('/:key', async (c) => {
     'Cache-Control': `public, max-age=${maxAge}`,
     'Content-Type': contentType,
   });
+});
+
+app.get('/:key/src', async (c) => {
+  const key = c.req.param('key');
+
+  const figmaUrl = await c.env.FIGMA_URL_KV.get(key);
+  if (!figmaUrl) return c.notFound();
+  return c.text(figmaUrl);
 });
 
 export default app;
