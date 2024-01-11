@@ -3,7 +3,7 @@ import { cache } from 'hono/cache';
 
 type Bindings = {
   FIGMA_TOKEN: string;
-  MY_BUCKET: R2Bucket;
+  FIGMA_IMAGE_BUCKET: R2Bucket;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -38,7 +38,7 @@ app.post('/upload', async (c) => {
   const fileName = imageUrl.split('/').at(-1) + '.png';
   const image = await fetch(imageUrl).then((res) => res.arrayBuffer());
 
-  await c.env.MY_BUCKET.put(fileName, image, {
+  await c.env.FIGMA_IMAGE_BUCKET.put(fileName, image, {
     httpMetadata: {
       contentType: 'image/png',
     },
@@ -59,7 +59,7 @@ const maxAge = 60 * 60 * 24 * 30;
 app.get('/:key', async (c) => {
   const key = c.req.param('key');
 
-  const object = await c.env.MY_BUCKET.get(key);
+  const object = await c.env.FIGMA_IMAGE_BUCKET.get(key);
   if (!object) return c.notFound();
   const data = await object.arrayBuffer();
   const contentType = object.httpMetadata?.contentType ?? '';
