@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cache } from 'hono/cache';
 import { basicAuth } from 'hono/basic-auth';
+import type { FC } from 'hono/jsx';
 
 type Bindings = {
   FIGMA_TOKEN: string;
@@ -86,6 +87,11 @@ app.get('/my/:key/src', async (c) => {
   const figmaUrl = await c.env.FIGMA_URL_KV.get(key);
   if (!figmaUrl) return c.notFound();
   return c.text(figmaUrl);
+});
+
+app.get('/my/list', async (c) => {
+  const keys = await c.env.FIGMA_URL_KV.list({ prefix: '' });
+  return c.json(keys);
 });
 
 export default app;
