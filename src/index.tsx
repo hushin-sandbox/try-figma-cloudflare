@@ -4,6 +4,7 @@ import { basicAuth } from 'hono/basic-auth';
 import { Image, renderer } from './component';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
+import { html } from 'hono/html';
 type Bindings = {
   FIGMA_TOKEN: string;
   USER: string;
@@ -117,11 +118,26 @@ app.get('/my/', async (c) => {
 
   return c.render(
     <>
+      {html`<style>
+        .loading {
+          display: none;
+        }
+        .htmx-request.loading {
+          display: inline;
+        }
+      </style>`}
       <h1>My Figma Images</h1>
-      <form hx-post="/my/upload" hx-swap="afterend">
+      <form
+        hx-post="/my/upload"
+        hx-target="#uploaded"
+        hx-swap="afterend"
+        hx-indicator=".loading"
+      >
         <input type="text" name="figmaUrl" placeholder="Figma URL" />
         <button type="submit">Upload</button>
       </form>
+      <div class="loading">Uploading...</div>
+      <div id="uploaded"></div>
       <ul>
         {keys.keys.map(({ name }) => (
           <li>
