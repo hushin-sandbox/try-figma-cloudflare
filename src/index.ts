@@ -52,7 +52,7 @@ app.post('/upload', async (c) => {
 app.get(
   '*',
   cache({
-    cacheName: 'r2-image-worker',
+    cacheName: 'figma-image-cache',
   })
 );
 
