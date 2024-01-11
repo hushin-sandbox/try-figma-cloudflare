@@ -20,7 +20,10 @@ export const renderer = jsxRenderer(({ children }) => {
 export const Image = ({ fileName }: { fileName: string }) => {
   return (
     <div>
-      <a href={`/${fileName}`}>{fileName}</a> <button>copy url</button>{' '}
+      <a href={`/${fileName}`} _target="blank">
+        {fileName}
+      </a>{' '}
+      <button data-url={fileName}>copy url</button>{' '}
       <button hx-get={`/my/${fileName}/src`} hx-swap="outerHTML">
         src
       </button>

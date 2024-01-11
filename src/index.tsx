@@ -145,6 +145,16 @@ app.get('/my/', async (c) => {
           </li>
         ))}
       </ul>
+      {html`<script>
+        window.addEventListener('click', function (event) {
+          const button = event.target.closest('button[data-url]');
+          if (button) {
+            const textToCopy =
+              location.origin + '/' + button.getAttribute('data-url');
+            navigator.clipboard.writeText(textToCopy);
+          }
+        });
+      </script>`}
     </>
   );
 });
