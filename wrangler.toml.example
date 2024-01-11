@@ -1,0 +1,20 @@
+name = "try-figma-cloudflare"
+compatibility_date = "2023-01-01"
+
+[vars]
+FIGMA_TOKEN = "figd_xx"
+USER = "xxx"
+PASS = "xxx"
+
+[[kv_namespaces]]
+binding = "FIGMA_URL_KV"
+id = "xxx"
+
+[[r2_buckets]]
+binding = "FIGMA_IMAGE_BUCKET"
+bucket_name = "xxx"
+
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "my-database"
+# database_id = ""
