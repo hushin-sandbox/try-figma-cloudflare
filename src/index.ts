@@ -1,8 +1,11 @@
 import { Hono } from 'hono';
 import { cache } from 'hono/cache';
+import { basicAuth } from 'hono/basic-auth';
 
 type Bindings = {
   FIGMA_TOKEN: string;
+  USER: string;
+  PASS: string;
   FIGMA_IMAGE_BUCKET: R2Bucket;
   FIGMA_URL_KV: KVNamespace;
 };
@@ -13,7 +16,12 @@ app.get('/', (c) => {
   return c.text('Hello Hono!');
 });
 
-app.post('/upload', async (c) => {
+app.use('/my/*', async (c, next) => {
+  const auth = basicAuth({ username: c.env.USER, password: c.env.PASS });
+  await auth(c, next);
+});
+
+app.post('/my/upload', async (c) => {
   const figmaUrl = await c.req.text();
 
   const [_1, fileKey] = figmaUrl.match(/\/file\/([a-zA-Z0-9]+)/) || [];
@@ -72,7 +80,7 @@ app.get('/:key', async (c) => {
   });
 });
 
-app.get('/:key/src', async (c) => {
+app.get('/my/:key/src', async (c) => {
   const key = c.req.param('key');
 
   const figmaUrl = await c.env.FIGMA_URL_KV.get(key);
