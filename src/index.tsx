@@ -58,12 +58,14 @@ app.post(
     const fileName = imageUrl.split('/').at(-1) + '.png';
     const image = await fetch(imageUrl).then((res) => res.arrayBuffer());
 
-    await c.env.FIGMA_IMAGE_BUCKET.put(fileName, image, {
-      httpMetadata: {
-        contentType: 'image/png',
-      },
-    });
-    await c.env.FIGMA_URL_KV.put(fileName, figmaUrl);
+    await Promise.all([
+      c.env.FIGMA_IMAGE_BUCKET.put(fileName, image, {
+        httpMetadata: {
+          contentType: 'image/png',
+        },
+      }),
+      c.env.FIGMA_URL_KV.put(fileName, figmaUrl),
+    ]);
 
     // return c.text(fileName);
     return c.html(
